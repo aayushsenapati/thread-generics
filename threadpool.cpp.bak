@@ -1,0 +1,87 @@
+#include <iostream>
+#include <pthread.h>
+
+// Base case for recursive template
+template<typename Func>
+struct TaskArgs {
+    Func func;
+};
+
+// Recursive template to handle variadic arguments
+template<typename Func, typename First, typename... Rest>
+struct TaskArgs : public TaskArgs<Func, Rest...> {
+    First arg;
+
+    TaskArgs(Func func, First arg, Rest... rest) : TaskArgs<Func, Rest...>(func, rest...), arg(arg) {}
+};
+
+// Base case for recursive function
+template<typename Func>
+void* execute_task_wrapper(void* arg) {
+    TaskArgs<Func>* task_args = static_cast<TaskArgs<Func>*>(arg);
+    task_args->func();
+    delete task_args; // Clean up memory
+    return nullptr;
+}
+
+// Recursive function to handle variadic arguments
+template<typename Func, typename First, typename... Rest>
+void* execute_task_wrapper(void* arg) {
+    TaskArgs<Func, First, Rest...>* task_args = static_cast<TaskArgs<Func, First, Rest...>*>(arg);
+    task_args->func(task_args->arg, execute_task_wrapper<Func, Rest...>(task_args));
+    delete task_args; // Clean up memory
+    return nullptr;
+}
+
+// Thread pool class
+class ThreadPool {
+private:
+    int num_threads;
+    pthread_t* threads;
+
+public:
+    // Constructor
+    ThreadPool(int num_threads) : num_threads(num_threads), threads(new pthread_t[num_threads]) {}
+
+    // Destructor
+    ~ThreadPool() {
+        delete[] threads;
+    }
+
+    // Function to add a task to the pool
+    template<typename Func, typename... Args>
+    void add_task(Func func, Args... args) {
+        TaskArgs<Func, Args...>* task_args = new TaskArgs<Func, Args...>(func, args...);
+        pthread_create(&threads[num_tasks++], nullptr, execute_task_wrapper<Func, Args...>, task_args);
+    }
+
+    // Function to wait for all tasks to complete
+    void wait() {
+        for (int i = 0; i < num_threads; ++i) {
+            pthread_join(threads[i], nullptr);
+        }
+    }
+private:
+    int num_tasks = 0;
+};
+
+// Define a function that will be executed by the thread pool
+void task_function(int task_id) {
+    std::cout << "Task " << task_id << " is being executed by thread " << pthread_self() << std::endl;
+}
+
+int main() {
+    // Create a thread pool with 4 threads
+    ThreadPool tp(4);
+
+    // Add tasks to the thread pool
+    for (int i = 0; i < 10; ++i) {
+        // Use add_task to add a task to the pool. Pass the function pointer and its arguments.
+        tp.add_task(task_function, i);
+    }
+
+    // Wait for all tasks to complete
+    tp.wait();
+
+    return 0;
+}
