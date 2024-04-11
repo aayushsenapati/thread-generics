@@ -150,7 +150,6 @@ public:
             return;
         Node *temp = head;
         head = head->next;
-        // delete temp->task; // delete task
         delete temp;
     }
 };
@@ -220,15 +219,7 @@ public:
         delete[] workers;
     }
 
-    // Overload for tasks without arguments
-    template <typename Func>
-    void enqueue(Func f)
-    {
-        pthread_mutex_lock(&lock);
-        tasks.push(new ConcreteTask<>(f));
-        pthread_cond_signal(&cond);
-        pthread_mutex_unlock(&lock);
-    }
+
 
     // Existing template for tasks with arguments
     template <typename... Args>
@@ -255,7 +246,7 @@ int main()
 {
     try
     {
-        ThreadPool pool(2);
+        ThreadPool pool(4);
         pool.enqueue(task1);
         pool.enqueue(task2, 42, 43,std::string("hello"));
 
