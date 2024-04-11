@@ -2,6 +2,12 @@
 #include <stdexcept>
 #include <iostream>
 
+
+
+pthread_mutex_t cout_lock;
+
+
+
 // Index sequence implementation
 template <int... Is>
 struct index_sequence
@@ -154,11 +160,13 @@ public:
     }
 };
 
+
+
+template <size_t N>
 class ThreadPool
 {
 private:
-    pthread_t *workers;
-    size_t numThreads;
+    pthread_t workers[N];
     Queue tasks;
     pthread_mutex_t lock;
     pthread_cond_t cond;
@@ -190,12 +198,12 @@ private:
     }
 
 public:
-    ThreadPool(size_t threads) : stop(false), numThreads(threads)
+    ThreadPool() : stop(false)
     {
-        workers = new pthread_t[threads];
         pthread_mutex_init(&lock, NULL);
         pthread_cond_init(&cond, NULL);
-        for (size_t i = 0; i < threads; ++i)
+        pthread_mutex_init(&cout_lock, NULL);
+        for (size_t i = 0; i < N; ++i)
         {
             if (pthread_create(&workers[i], NULL, worker, this) != 0)
             {
@@ -210,16 +218,13 @@ public:
         stop = true;
         pthread_mutex_unlock(&lock);
         pthread_cond_broadcast(&cond);
-        for (size_t i = 0; i < numThreads; ++i)
+        for (size_t i = 0; i < N; ++i)
         {
             pthread_join(workers[i], NULL);
         }
         pthread_mutex_destroy(&lock);
         pthread_cond_destroy(&cond);
-        delete[] workers;
     }
-
-
 
     // Existing template for tasks with arguments
     template <typename... Args>
@@ -234,19 +239,23 @@ public:
 
 void task1()
 {
+    pthread_mutex_lock(&cout_lock);
     std::cout << "Task 1 is running" << std::endl;
+    pthread_mutex_unlock(&cout_lock);
 }
 
 void task2(int x, int y,std::string z)
 {
+    pthread_mutex_lock(&cout_lock);
     std::cout << "Task 2 is running with arguments " << x << " and " << y<<"and"<<z << std::endl;
+    pthread_mutex_unlock(&cout_lock);
 }
 
 int main()
 {
     try
     {
-        ThreadPool pool(4);
+        ThreadPool<4> pool;
         pool.enqueue(task1);
         pool.enqueue(task2, 42, 43,std::string("hello"));
 
