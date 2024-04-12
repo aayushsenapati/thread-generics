@@ -19,9 +19,8 @@ struct make_index_sequence<0, Is...> : index_sequence<Is...>
 {
 };
 
+/*-----------------------------------------------------------------------------------------------------------*/
 
-
-// Tuple-like structure using template recursion
 // Tuple-like structure using template recursion
 template <typename... Args>
 struct Tuple
@@ -69,6 +68,9 @@ struct Tuple<T> : public Tuple<>
         return head;
     }
 };
+
+
+/*---------------------------------------------------------------------------------------------------------------------------------*/
 
 
 

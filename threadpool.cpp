@@ -3,10 +3,7 @@
 #include <iostream>
 #include "utilities.h"
 
-
-
 pthread_mutex_t cout_lock;
-
 
 
 // Abstract base class for tasks
@@ -45,7 +42,12 @@ private:
     template <typename F, typename... ArgsT, int... Is>
     void callWithArguments(F func, Tuple<ArgsT...> *t, index_sequence<Is...>)
     {
-        func(t->template get<Is>()...);
+        auto lambda=[]<typename FuncLambda,typename... ArgL,int... Indices>(FuncLambda f,Tuple<ArgL...>* t,index_sequence<Indices...>)
+        {
+            f(t->template get<Indices>()...);
+        };
+        //func(t->template get<Is>()...);
+        lambda(func,t,index_sequence<Is...>{});
     }
 };
 
