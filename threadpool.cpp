@@ -57,6 +57,7 @@ private:
 template <size_t N>
 class ThreadPool
 {
+    
 private:
     pthread_t workers[N];
     Queue<AbstractTask> tasks;
@@ -117,6 +118,8 @@ public:
         pthread_mutex_destroy(&lock);
         pthread_cond_destroy(&cond);
     }
+
+
 
     // Existing template for tasks with arguments
     template <typename Func, typename... Args>
