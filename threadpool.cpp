@@ -1,10 +1,16 @@
 #include <pthread.h>
 #include <stdexcept>
 #include <iostream>
+#include <concepts>
 #include "utilities.h"
 
 pthread_mutex_t cout_lock;
 
+// Define a concept for callable functions
+template <typename Func, typename... Args>
+concept Callable = requires(Func f, Args... args) {
+    { f(args...) } -> std::same_as<void>;
+};
 
 // Abstract base class for tasks
 class AbstractTask
@@ -19,8 +25,6 @@ template <typename Func, typename... Args>
 class ConcreteTask : public AbstractTask
 {
 public:
-    //using FunctionPtr = void (*)(Args...);
-
     ConcreteTask(Func f, Args... args)
         : func(f), arguments(new Tuple<Args...>(args...)) {}
 
@@ -35,23 +39,19 @@ public:
     }
 
 private:
-    //FunctionPtr func;
     Func func;
     Tuple<Args...> *arguments;
 
     template <typename F, typename... ArgsT, int... Is>
     void callWithArguments(F func, Tuple<ArgsT...> *t, index_sequence<Is...>)
     {
-        auto lambda=[]<typename FuncLambda,typename... ArgL,int... Indices>(FuncLambda f,Tuple<ArgL...>* t,index_sequence<Indices...>)
+        auto lambda = []<typename FuncLambda, typename... ArgL, int... Indices>(FuncLambda f, Tuple<ArgL...> *t, index_sequence<Indices...>)
         {
             f(t->template get<Indices>()...);
         };
-        //func(t->template get<Is>()...);
-        lambda(func,t,index_sequence<Is...>{});
+        lambda(func, t, index_sequence<Is...>{});
     }
 };
-
-
 
 // Thread pool class
 template <size_t N>
@@ -59,7 +59,7 @@ class ThreadPool
 {
 private:
     pthread_t workers[N];
-    Queue <AbstractTask> tasks;
+    Queue<AbstractTask> tasks;
     pthread_mutex_t lock;
     pthread_cond_t cond;
     bool stop;
@@ -120,10 +120,9 @@ public:
 
     // Existing template for tasks with arguments
     template <typename Func, typename... Args>
+    requires Callable<Func, Args...>
     void enqueue(Func f, Args... args)
     {
-        static_assert(std::is_same<decltype(f(args...)), void>::value, "Function must return void");
-
         auto task = new ConcreteTask<Func, Args...>(f, args...);
         pthread_mutex_lock(&lock);
         tasks.push(task);
@@ -139,14 +138,12 @@ void task1()
     pthread_mutex_unlock(&cout_lock);
 }
 
-void task2(int x, int y,std::string z)
+void task2(int x, int y, std::string z)
 {
     pthread_mutex_lock(&cout_lock);
-    std::cout << "Task 2 is running with arguments " << x << " and " << y<<"and"<<z << std::endl;
+    std::cout << "Task 2 is running with arguments " << x << " and " << y << " and " << z << std::endl;
     pthread_mutex_unlock(&cout_lock);
 }
-
-
 
 int main()
 {
@@ -154,12 +151,12 @@ int main()
     {
         ThreadPool<4> pool;
         pool.enqueue(task1);
-        pool.enqueue(task2, 42, 43,std::string("hello"));
-        pool.enqueue([](){
+        pool.enqueue(task2, 42, 43, std::string("hello"));
+        pool.enqueue([]()
+                     {
             pthread_mutex_lock(&cout_lock);
             std::cout << "Lambda task is running" << std::endl;
-            pthread_mutex_unlock(&cout_lock);
-        });
+            pthread_mutex_unlock(&cout_lock); });
 
         return 0;
     }
