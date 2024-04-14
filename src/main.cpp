@@ -1,9 +1,5 @@
 #include <iostream>
-#include "threadpool.h"
-#include "parallelfor.h"
-#include "master.cpp"
-#include "mutex_locks.cpp"
-#include "thread_local_storage.cpp"
+#include "Threading.h"
 pthread_mutex_t cout_lock;
 
 void task1()
@@ -29,10 +25,11 @@ int main()
         pool.enqueue(task1);
         pool.enqueue(task2, 42, 43, std::string("hello"));
         pool.enqueue([]()
-                     {
-            pthread_mutex_lock(&cout_lock);
-            std::cout << "Lambda task is running" << std::endl;
-            pthread_mutex_unlock(&cout_lock); });
+            {
+                pthread_mutex_lock(&cout_lock);
+                std::cout << "Lambda task is running" << std::endl;
+                pthread_mutex_unlock(&cout_lock);
+            });
 
         int x = 5;
         Threading::parallel_for_pthreads(0, 10, [x](int i)
