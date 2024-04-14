@@ -106,6 +106,7 @@ namespace Threading
         ThreadPool() : stop(false)
         {
             pthread_cond_init(&cond, NULL);
+            pthread_mutex_init(&lock, NULL);
             for (size_t i = 0; i < N; ++i)
             {
                 if (pthread_create(&workers[i], NULL, worker, this) != 0)
