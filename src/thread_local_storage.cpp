@@ -1,3 +1,5 @@
+#ifndef THREAD_LOCAL_CPP
+#define THREAD_LOCAL_CPP
 #include <iostream>
 #include <pthread.h>
 
@@ -33,3 +35,5 @@ public:
         return (ptr != nullptr) ? *static_cast<T*>(ptr) : T(); // Return the value (or default value if null)
     }
 };
+
+#endif
