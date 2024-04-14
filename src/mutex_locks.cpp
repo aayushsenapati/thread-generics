@@ -40,4 +40,42 @@ public:
         mutex.unlock(); // Unlock the mutex
     }
 };
+
+// Shared resource
+int shared_resource = 0;
+
+// Mutex for protecting shared resource
+Mutex mutex;
+
+// Function to be executed by multiple threads
+void* thread_func(void* arg) {
+    for (int i = 0; i < 10000; ++i) {
+        Lock lock(mutex); // Lock the mutex
+
+        // Critical section: Accessing and modifying shared resource
+        shared_resource++;
+    }
+    return nullptr;
+}
+
+int main() {
+    const int num_threads = 4;
+    pthread_t threads[num_threads];
+
+    // Create threads
+    for (int i = 0; i < num_threads; ++i) {
+        pthread_create(&threads[i], nullptr, thread_func, nullptr);
+    }
+
+    // Join threads
+    for (int i = 0; i < num_threads; ++i) {
+        pthread_join(threads[i], nullptr);
+    }
+
+    // Print shared resource value
+    std::cout << "Shared resource value: " << shared_resource << std::endl;
+
+    return 0;
+}
+
 #endif
