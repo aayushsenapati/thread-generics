@@ -3,6 +3,7 @@
 #include <iostream>
 #include <pthread.h>
 
+namespace Threading{
 // Mutex class
 class Mutex {
 private:
@@ -41,21 +42,6 @@ public:
     }
 };
 
-// Shared resource
-int shared_resource = 0;
-
-// Mutex for protecting shared resource
-Mutex mutex;
-
-// Function to be executed by multiple threads
-void* thread_func(void* arg) {
-    for (int i = 0; i < 10000; ++i) {
-        Lock lock(mutex); // Lock the mutex
-
-        // Critical section: Accessing and modifying shared resource
-        shared_resource++;
-    }
-    return nullptr;
 }
 
 #endif

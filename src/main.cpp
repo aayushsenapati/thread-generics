@@ -38,10 +38,10 @@ int main()
         Threading::Master master;
         master.stopThreadPool(pool);
 
-        Mutex mtx;
+        Threading::Mutex mtx;
 
         {
-            Lock lock(mtx);
+            Threading::Lock lock(mtx);
             // Critical section goes here.
             // The mutex is locked at this point.
             std::cout << "Inside critical section.\n";

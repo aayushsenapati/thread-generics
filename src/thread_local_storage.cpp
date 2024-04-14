@@ -3,7 +3,11 @@
 #include <iostream>
 #include <pthread.h>
 
+
+namespace Threading{
+    
 // Thread Local Storage class
+
 template <typename T>
 class ThreadLocalStorage {
 private:
@@ -35,5 +39,6 @@ public:
         return (ptr != nullptr) ? *static_cast<T*>(ptr) : T(); // Return the value (or default value if null)
     }
 };
+}
 
 #endif
