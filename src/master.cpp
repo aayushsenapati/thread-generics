@@ -3,6 +3,9 @@
 #include "threadpool.h"
 #include <pthread.h>
 
+
+//friend master function of threadpool class to stop the threadpool
+
 namespace Threading{
 class Master {
 public:

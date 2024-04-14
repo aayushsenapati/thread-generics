@@ -9,7 +9,7 @@ SRCS = src/main.cpp
 
 
 # Executable name
-EXEC = bin/myprogram
+EXEC = bin/gp_threading
 
 # Default target
 all: build run

@@ -27,8 +27,11 @@ void* threadFunc(void* arg) {
     // Get the thread-local variable
     pthread_t value = tls->get();
 
+    pthread_mutex_lock(&cout_lock);
+
     // Print the thread ID and the thread-local variable
     std::cout << "Thread ID: " << pthread_self() << ", Thread-Local Variable: " << value << std::endl;
+    pthread_mutex_unlock(&cout_lock);
 
     return nullptr;
 }

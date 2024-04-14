@@ -38,6 +38,7 @@ public:
     }
 
     ~Lock() {
+        std::cout << "Unlocking mutex" << std::endl;
         mutex.unlock(); // Unlock the mutex
     }
 };
