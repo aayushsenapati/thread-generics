@@ -1,3 +1,5 @@
+#ifndef MUTEX_LOCKS_CPP
+#define MUTEX_LOCKS_CPP
 #include <iostream>
 #include <pthread.h>
 
@@ -38,3 +40,4 @@ public:
         mutex.unlock(); // Unlock the mutex
     }
 };
+#endif
