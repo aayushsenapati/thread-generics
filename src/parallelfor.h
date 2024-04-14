@@ -4,6 +4,11 @@
 #include <iostream>
 #include <pthread.h>
 
+/*
+* Concept for checking if a function takes an integral type and returns void.
+* This is used to ensure that the function passed to parallel_for_pthreads meets these requirements.
+*/
+
 template <typename Func, typename Arg>
 concept VoidFunctionWithIntegralArg = requires(Func f, Arg a) {
     {
@@ -12,6 +17,12 @@ concept VoidFunctionWithIntegralArg = requires(Func f, Arg a) {
     requires std::is_integral_v<Arg>;
 };
 
+
+/*
+* Concept for checking if a function is suitable for parallel_for_pthreads.
+* A suitable function is one that takes an integral type and returns void.
+*/
+
 template <typename Func>
 concept SuitableFunction =
     VoidFunctionWithIntegralArg<Func, int> ||
@@ -19,7 +30,11 @@ concept SuitableFunction =
     VoidFunctionWithIntegralArg<Func, long long> ||
     VoidFunctionWithIntegralArg<Func, short>;
 
-// Struct for passing arguments to thread function
+/*
+* Struct for passing arguments to the thread function.
+* This is necessary because pthread_create can only pass one argument to the thread function,
+* so we need to pack all our arguments into a single struct.
+*/
 template <typename Func>
 struct ThreadArgs
 {
@@ -28,7 +43,13 @@ struct ThreadArgs
     Func func;
 };
 
-// Thread function
+
+
+
+/*
+* Function that each thread will run. It takes a ThreadArgs struct, unpacks the arguments,
+* and calls the function for each integer in the range [start, end).
+*/
 template <typename Func>
 void *thread_func(void *arg)
 {
@@ -40,7 +61,12 @@ void *thread_func(void *arg)
     return nullptr;
 }
 
-// Parallel For Loop implementation using Pthreads and Function Pointers
+/*
+* Parallel For Loop implementation using Pthreads and Function Pointers.
+* A parallel for loop is a loop where each iteration is run in parallel on a separate thread.
+* This function takes a range [start, end), a function to run on each integer in the range,
+* and the number of threads to use. It creates the threads, starts them, and then waits for them to finish.
+*/
 namespace Threading
 {
     template <typename Func>

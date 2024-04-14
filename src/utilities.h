@@ -74,7 +74,7 @@ struct Tuple<T> : public Tuple<>
 
 
 
-//queue
+//Queue implementation.
 template <typename T>
 class Queue
 {
