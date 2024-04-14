@@ -58,24 +58,4 @@ void* thread_func(void* arg) {
     return nullptr;
 }
 
-int main() {
-    const int num_threads = 4;
-    pthread_t threads[num_threads];
-
-    // Create threads
-    for (int i = 0; i < num_threads; ++i) {
-        pthread_create(&threads[i], nullptr, thread_func, nullptr);
-    }
-
-    // Join threads
-    for (int i = 0; i < num_threads; ++i) {
-        pthread_join(threads[i], nullptr);
-    }
-
-    // Print shared resource value
-    std::cout << "Shared resource value: " << shared_resource << std::endl;
-
-    return 0;
-}
-
 #endif

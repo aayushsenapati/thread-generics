@@ -2,7 +2,8 @@
 #include "threadpool.h"
 #include "parallelfor.h"
 #include "master.cpp"
-
+#include "mutex_locks.cpp"
+#include "thread_local_storage.cpp"
 pthread_mutex_t cout_lock;
 
 void task1()
@@ -35,10 +36,23 @@ int main()
 
         int x = 5;
         Threading::parallel_for_pthreads(0, 10, [x](int i)
-                              { std::cout << "Task " << i << " finished by thread " << pthread_self() << ", x = " << x << std::endl; });
+                                         { std::cout << "Task " << i << " finished by thread " << pthread_self() << ", x = " << x << std::endl; });
 
         Threading::Master master;
         master.stopThreadPool(pool);
+
+        Mutex mtx;
+
+        {
+            Lock lock(mtx);
+            // Critical section goes here.
+            // The mutex is locked at this point.
+            std::cout << "Inside critical section.\n";
+            // The mutex will be automatically unlocked
+            // when the lock object goes out of scope.
+        }
+
+        std::cout << "Outside critical section.\n";
         return 0;
     }
     catch (const std::exception &e)
