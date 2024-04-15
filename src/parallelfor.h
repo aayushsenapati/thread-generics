@@ -79,7 +79,9 @@ namespace Threading
 
         for (int i = 0; i < num_threads; ++i)
         {
-            thread_args[i] = new ThreadArgs<Func>{start + i * step, start + (i + 1) * step, func};
+            int thread_start = start + i * step;
+            int thread_end = (i == num_threads - 1) ? end : thread_start + step;
+            thread_args[i] = new ThreadArgs<Func>{thread_start, thread_end, func};
             pthread_create(&threads[i], nullptr, thread_func<Func>, thread_args[i]);
         }
 
