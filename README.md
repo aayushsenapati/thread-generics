@@ -63,6 +63,21 @@ mtx.lock();
 mtx.unlock();
 ```
 
+**Auto Unlocking Mutex**
+```
+void criticalSectionFunction() {
+    Threading::Mutex mtx; // Create a mutex
+
+    {
+        Threading::Lock lock(mtx); // Automatically locks the mutex
+        // Critical section: Only one thread can execute this code at a time
+        // Perform operations that require exclusive access to shared resources
+    } // The mutex is automatically unlocked here when the Lock object goes out of scope
+
+    // The mutex is now unlocked, and other threads can access the shared resources
+}
+```
+
 
 ### Thread Local Storage
 
