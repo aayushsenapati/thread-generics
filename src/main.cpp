@@ -46,6 +46,18 @@ void* threadFunc(void* arg) {
     return nullptr;
 }
 
+
+class NonCopyable {
+public:
+    NonCopyable() = default;
+    NonCopyable(const NonCopyable&) = delete; // delete copy constructor
+    NonCopyable& operator=(const NonCopyable&) = delete; // delete copy assignment operator
+};
+
+void someFunction(NonCopyable& nc) {
+    // Some operation on nc
+}
+
 int main()
 {
     try
@@ -55,14 +67,17 @@ int main()
 
         pthread_mutex_init(&cout_lock, NULL);
         Threading::ThreadPool<4> pool;
+        NonCopyable nc;
         pool.enqueue(task1);
         pool.enqueue(task2, 42, 43, std::string("hello"));
         pool.enqueue([]()
             {
                 pthread_mutex_lock(&cout_lock);
-                std::cout << GREEN << "Lambda task is running" << RESET << std::endl;
+                std::cout << GREEN << "Lambda task is running"<< std::endl << RESET ;
                 pthread_mutex_unlock(&cout_lock);
             });
+
+        //pool.enqueue(someFunction, &nc);
 
         Threading::Master master;
         master.stopThreadPool(pool);
