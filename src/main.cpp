@@ -47,17 +47,6 @@ void* threadFunc(void* arg) {
 }
 
 
-class NonCopyable {
-public:
-    NonCopyable() = default;
-    NonCopyable(const NonCopyable&) = delete; // delete copy constructor
-    NonCopyable& operator=(const NonCopyable&) = delete; // delete copy assignment operator
-};
-
-void someFunction(NonCopyable& nc) {
-    // Some operation on nc
-}
-
 int main()
 {
     try
@@ -67,7 +56,6 @@ int main()
 
         pthread_mutex_init(&cout_lock, NULL);
         Threading::ThreadPool<4> pool;
-        NonCopyable nc;
         pool.enqueue(task1);
         pool.enqueue(task2, 42, 43, std::string("hello"));
         pool.enqueue([]()

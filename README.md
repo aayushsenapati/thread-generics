@@ -28,6 +28,8 @@ The library includes utility functions for tasks such as index sequences and tup
 
 ## Usage
 
+Refer to `main.cpp` to see the API in action.
+
 ### Thread Pool
 
 To use the thread pool, create an instance of the `ThreadPool` class with the desired number of threads. Then, enqueue tasks using the `enqueue` method, which takes a function and its arguments. The thread pool will execute these tasks in parallel using its worker threads.
