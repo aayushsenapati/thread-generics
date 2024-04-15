@@ -64,7 +64,7 @@ mtx.unlock();
 ```
 
 **Auto Unlocking Mutex**
-```
+```c++
 void criticalSectionFunction() {
     Threading::Mutex mtx; // Create a mutex
 
